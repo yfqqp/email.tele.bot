@@ -57,7 +57,7 @@ async def get_or_create_user(message: types.Message):
 def is_admin(user_id: int) -> bool:
     """Check if user is admin"""
     return user_id in ADMIN_IDS
-  # ================= User Commands =================
+    # ================= User Commands =================
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
@@ -129,7 +129,7 @@ async def cmd_inbox(message: types.Message):
 async def cmd_otp(message: types.Message):
     """Find OTP codes"""
     await find_otp_codes(message.from_user.id, message)
-  # ================= Callback Handlers =================
+    # ================= Callback Handlers =================
 
 @dp.callback_query(F.data == "menu")
 async def back_to_menu(callback: types.CallbackQuery):
@@ -242,7 +242,9 @@ async def show_inbox(user_id: int = None, message_obj = None, callback: types.Ca
         await callback.answer()
     else:
         await message_obj.answer(text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
-      @dp.callback_query(F.data.startswith("read_"))
+
+
+@dp.callback_query(F.data.startswith("read_"))
 async def read_message(callback: types.CallbackQuery):
     """Read a specific message"""
     message_id = int(callback.data.split("_")[1])
@@ -291,6 +293,7 @@ async def read_message(callback: types.CallbackQuery):
     
     await callback.message.edit_text(text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
     await callback.answer()
+
 
 @dp.callback_query(F.data == "otp_finder")
 async def find_otp_codes(user_id: int = None, message_obj = None, callback: types.CallbackQuery = None):
@@ -346,8 +349,7 @@ async def find_otp_codes(user_id: int = None, message_obj = None, callback: type
     
     if callback:
         await callback.answer()
-
-@dp.callback_query(F.data == "settings")
+        @dp.callback_query(F.data == "settings")
 async def show_settings(callback: types.CallbackQuery):
     """Show settings menu"""
     await callback.message.edit_text(
@@ -422,9 +424,9 @@ async def admin_users(callback: types.CallbackQuery):
         return
     
     users = db.get_all_users(limit=20)
-    text = "👥 *قائمة المستخدمين*\n\n" if users else "👥 *لا يوجد مستخدمين*"
+    text = "👥 *قائمة المستخدمين (آخر 20)*\n\n" if users else "👥 *لا يوجد مستخدمين*"
     for user in users:
-        text += f"🆔 {user['user_id']}\n📝 {user['username'] or user['first_name']}\n📧 {user['email']}\n➖➖➖\n"
+        text += f"🆔 {user['user_id']}\n📝 {user['username'] or user['first_name']}\n📧 {user['email']}\n📨 {user['total_emails_received']} رسائل\n➖➖➖\n"
     
     await callback.message.edit_text(text, reply_markup=get_admin_keyboard(), parse_mode=ParseMode.MARKDOWN)
 
